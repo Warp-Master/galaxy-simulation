@@ -1,10 +1,10 @@
 #include "mainwindow.h"
 #include "math.h"
 
-#include "ui_mainwindow.h"
+#include "build/ui_mainwindow.h"
 #include <QPainter>
 #include <QTime>
-#include <star.h>
+#include "star.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
@@ -30,7 +30,7 @@ void MainWindow::buttonText(){
 }
 
 const int topX0 = 100, topY0 = 100, h = 800, length = 800;
-galaxy *galactika = new galaxy;
+Galaxy *galactika = new Galaxy;
 
 void MainWindow::paintEvent(QPaintEvent *e) {
   Q_UNUSED(e);
@@ -64,9 +64,9 @@ void MainWindow::paintEvent(QPaintEvent *e) {
           }
       }
   }
-  galactika->move();
+  galactika->update();
 
-  ui->lineEdit->setText(QString::number(star::starCounter));
+  ui->lineEdit->setText(QString::number(Star::starCounter));
   ui->lineEdit_2->setText(QString::number(galactika->stars[0]->m));
   ui->lineEdit_3->setText(QString::number(galactika->stars[0]->x[0]));
 }

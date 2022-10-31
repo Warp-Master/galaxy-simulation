@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QTimer>
@@ -28,5 +27,3 @@ protected:
 private slots:
     void buttonText();
 };
-
-#endif // MAINWINDOW_H

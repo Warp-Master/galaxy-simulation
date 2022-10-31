@@ -1,4 +1,5 @@
 QT       += core gui
+QT       += opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,6 +19,8 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui
+
+TARGET = bin/app
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
