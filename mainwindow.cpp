@@ -8,7 +8,7 @@
 #include "Galaxy.h"
 #include "constants.hpp"
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 //    connect(ui->pushButtonStart,  SIGNAL(clicked()), this, SLOT(buttonText()));
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::update));
@@ -16,59 +16,58 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     timer->start(1);
 }
 
-MainWindow::~MainWindow(){
+MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::buttonText(){
-    if(ui->pushButtonStart->text()==textB[0]){
+void MainWindow::buttonText() {
+    if (ui->pushButtonStart->text() == textB[0]) {
         ui->pushButtonStart->setText(textB[1]);
         connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::update));
-    }else{
+    } else {
         ui->pushButtonStart->setText(textB[0]);
         disconnect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::update));
     }
-    return;
 }
 
 const int topX0 = 100, topY0 = 100, h = 800, length = 800;
-Galaxy *galactika = new Galaxy;
+Galaxy *galactika = new Galaxy(numStars);
 
 void MainWindow::paintEvent(QPaintEvent *e) {
-  Q_UNUSED(e);
-  QPainter painter(this);
-  QPen pen(Qt::black, 1, Qt::SolidLine);
-  painter.setPen(pen);
+    Q_UNUSED(e);
+    QPainter painter(this);
+    QPen pen(Qt::black, 1, Qt::SolidLine);
+    painter.setPen(pen);
 
 //  QTime time = QTime::currentTime();
 //  int mSec = time.msec();
 //  int Sec = time.second();
 
-  QBrush brush;//(Qt::yellow);
-  brush.setStyle(Qt::SolidPattern);
+    QBrush brush;//(Qt::yellow);
+    brush.setStyle(Qt::SolidPattern);
 
-  double coefX = length / 2 / 1e12; // system radius
-  int centerX = length / 2;
-  for(int i = 0; i < galactika->num; ++i){
-      if(galactika->stars[i]){
-          brush.setColor(galactika->stars[i]->col);
-          if(!i) brush.setColor(Qt::yellow);
-          painter.setBrush(brush);
-          for(int k = 0; k < 2; ++k){
-             // условие не рисовать вне квадрата
-             /* if(galactika->stars[i]->x[0] * coefX + centerX + topX0 > 0 &&
-                 galactika->stars[i]->x[0] * coefX + centerX  < length &&
-                 galactika->stars[i]->x[1] * coefX + centerX + topY0 > 0 &&
-                 galactika->stars[i]->x[1] * coefX + centerX  < h) */
-                    painter.drawEllipse(galactika->stars[i]->x[0] * coefX + centerX + topX0,
-                                        galactika->stars[i]->x[1] * coefX + centerX + topY0,
-                                        6 + 4 * !i, 6 + 4 * !i);
-          }
-      }
-  }
-  galactika->update();
+    double coefX = length / 2 / 1e12; // system radius
+    int centerX = length / 2;
+    for (size_t i = 0; i < galactika->num; ++i) {
+        if (galactika->stars[i]) {
+            brush.setColor(galactika->stars[i]->col);
+            if (!i) brush.setColor(Qt::yellow);
+            painter.setBrush(brush);
+            for (int k = 0; k < 2; ++k) {
+                // условие не рисовать вне квадрата
+                /* if(galactika->stars[i]->x[0] * coefX + centerX + topX0 > 0 &&
+                    galactika->stars[i]->x[0] * coefX + centerX  < length &&
+                    galactika->stars[i]->x[1] * coefX + centerX + topY0 > 0 &&
+                    galactika->stars[i]->x[1] * coefX + centerX  < h) */
+                painter.drawEllipse(floor(galactika->stars[i]->x[0] * coefX + centerX + topX0),
+                                    floor(galactika->stars[i]->x[1] * coefX + centerX + topY0),
+                                    6 + 4 * !i, 6 + 4 * !i);
+            }
+        }
+    }
+    galactika->update();
 
-  ui->lineEdit->setText(QString::number(Star::starCounter));
-  ui->lineEdit_2->setText(QString::number(galactika->stars[0]->m));
-  ui->lineEdit_3->setText(QString::number(galactika->stars[0]->x[0]));
+    ui->lineEdit->setText(QString::number(Star::starCounter));
+    ui->lineEdit_2->setText(QString::number(galactika->stars[0]->m));
+    ui->lineEdit_3->setText(QString::number(galactika->stars[0]->x[0]));
 }
