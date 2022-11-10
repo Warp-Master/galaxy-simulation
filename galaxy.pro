@@ -15,7 +15,9 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    star.h
+    Star.h \
+    Galaxy.h \
+    constants.hpp
 
 FORMS += \
     mainwindow.ui

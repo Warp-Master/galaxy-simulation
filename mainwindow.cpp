@@ -1,10 +1,12 @@
 #include "mainwindow.h"
-#include "math.h"
+#include <cmath>
 
 #include "build/ui_mainwindow.h"
 #include <QPainter>
 #include <QTime>
-#include "star.h"
+#include "Star.h"
+#include "Galaxy.h"
+#include "constants.hpp"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
