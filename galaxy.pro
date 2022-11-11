@@ -11,16 +11,16 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    MainWindow.cpp
 
 HEADERS += \
-    mainwindow.h \
-    Star.h \
-    Galaxy.h \
+    MainWindow.hpp \
+    Star.hpp \
+    Galaxy.hpp \
     constants.hpp
 
 FORMS += \
-    mainwindow.ui
+    MainWindow.ui
 
 TARGET = bin/app
 
