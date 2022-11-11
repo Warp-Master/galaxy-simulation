@@ -6,22 +6,18 @@
 
 class Star {
 public:
-    static size_t starCounter;
-    double x[dim]{};
-    double v[dim]{};
+    double x[dim]{0};
+    double v[dim]{0};
     double m;
-    double f[dim]{};
+    double f[dim]{0};
     QColor col;
 
     Star(const double *coord, const double *speed, double mass);
 
-    ~Star() { starCounter--; }
     Star& operator+=(const Star& rhs);
 private:
     void updateColor();
 };
-
-size_t Star::starCounter = 0;
 
 Star::Star(const double *coord, const double *speed, double mass) {
     for (int k = 0; k < dim; ++k) {
@@ -30,7 +26,6 @@ Star::Star(const double *coord, const double *speed, double mass) {
     }
     m = mass;
     updateColor();
-    starCounter++;
 }
 
 Star& Star::operator+=(const Star &rhs) {

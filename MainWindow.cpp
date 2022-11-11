@@ -4,7 +4,7 @@
 #include "build/ui_mainwindow.h"
 #include <QPainter>
 #include <QTime>
-#include "Star.h"
+#include "Star.hpp"
 #include "Galaxy.hpp"
 #include "constants.hpp"
 
@@ -31,7 +31,7 @@ void MainWindow::buttonText() {
 }
 
 const int topX0 = 100, topY0 = 100, h = 800, length = 800;
-Galaxy *galactika = new Galaxy(numStars);
+Galaxy *galaxy = new Galaxy(numStars);
 
 void MainWindow::paintEvent(QPaintEvent *e) {
     Q_UNUSED(e);
@@ -43,31 +43,26 @@ void MainWindow::paintEvent(QPaintEvent *e) {
 //  int mSec = time.msec();
 //  int Sec = time.second();
 
-    QBrush brush;//(Qt::yellow);
+    QBrush brush;
     brush.setStyle(Qt::SolidPattern);
 
     double coefX = length / 2 / 1e12; // system radius
     int centerX = length / 2;
-    for (size_t i = 0; i < galactika->num; ++i) {
-        if (galactika->stars[i]) {
-            brush.setColor(galactika->stars[i]->col);
-            if (!i) brush.setColor(Qt::yellow);
-            painter.setBrush(brush);
-            for (int k = 0; k < 2; ++k) {
-                // условие не рисовать вне квадрата
-                /* if(galactika->stars[i]->x[0] * coefX + centerX + topX0 > 0 &&
-                    galactika->stars[i]->x[0] * coefX + centerX  < length &&
-                    galactika->stars[i]->x[1] * coefX + centerX + topY0 > 0 &&
-                    galactika->stars[i]->x[1] * coefX + centerX  < h) */
-                painter.drawEllipse(floor(galactika->stars[i]->x[0] * coefX + centerX + topX0),
-                                    floor(galactika->stars[i]->x[1] * coefX + centerX + topY0),
-                                    6 + 4 * !i, 6 + 4 * !i);
-            }
-        }
+    for (Star *star_i: galaxy->stars) {
+        brush.setColor(star_i->col);
+        painter.setBrush(brush);
+        // условие не рисовать вне квадрата
+        /* if(galactika->stars[i]->x[0] * coefX + centerX + topX0 > 0 &&
+            galactika->stars[i]->x[0] * coefX + centerX  < length &&
+            galactika->stars[i]->x[1] * coefX + centerX + topY0 > 0 &&
+            galactika->stars[i]->x[1] * coefX + centerX  < h) */
+        painter.drawEllipse(floor(star_i->x[0] * coefX + centerX + topX0),
+                            floor(star_i->x[1] * coefX + centerX + topY0),
+                            6, 6);
     }
-    galactika->update();
+    galaxy->update();
 
-    ui->lineEdit->setText(QString::number(Star::starCounter));
-    ui->lineEdit_2->setText(QString::number(galactika->stars[0]->m));
-    ui->lineEdit_3->setText(QString::number(galactika->stars[0]->x[0]));
+    ui->lineEdit->setText(QString::number(galaxy->stars.size()));
+    ui->lineEdit_2->setText(QString::number(galaxy->central_star->m));
+    ui->lineEdit_3->setText(QString::number(galaxy->central_star->x[0]));
 }

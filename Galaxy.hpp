@@ -2,114 +2,104 @@
 
 #include "cmath"
 #include <QPainter>
+#include <unordered_set>
+#include <cstdint>
+
+
+double invsqrtQuake( double number )
+{
+    double y = number;
+    double x2 = y * 0.5;
+    std::int64_t i = *(std::int64_t *) &y;  // evil floating point bit level hacking
+    i = 0x5fe6eb50c7b537a9 - (i >> 1);      // what the fuck?
+    y = *(double *) &i;
+    y = y * (1.5 - (x2 * y * y));           // 1st iteration
+//  y  = y * ( 1.5 - ( x2 * y * y ) );      // 2nd iteration, this can be removed
+    return y;
+}
+
 
 class Galaxy {
 public:
     size_t num;
-    Star **stars;
+    std::unordered_set<Star *> stars;
+    Star *central_star;
 
     explicit Galaxy(size_t n = numStars) : num(n) {
-        stars = new Star *[num];
         double x1[dim] = {0},
                 v1[dim] = {0};
-        stars[0] = new Star(x1, v1, massSun); // самый массивный объект в начале координат
-        double rad;
-        // Проходимся по объектам и назначаем им радиус, координаты
+        central_star = new Star(x1, v1, massSun); // Creating central object
+        stars.insert(central_star);
+        // Creating other objects
         for (size_t i = 1; i < num; ++i) {
-            rad = 0;
+            double rad = 0;
             double R = rand() * systemRadius / RAND_MAX,
-                   fi = (2 * M_PI * rand()) / RAND_MAX,
-                   theta = (M_PI * rand()) / RAND_MAX;
+                    fi = (2 * M_PI * rand()) / RAND_MAX,
+                    theta = (M_PI * rand()) / RAND_MAX;
             x1[0] = R * cos(fi);
             x1[1] = R * sin(fi);
 
-            if (dim == 3) {
-                x1[0] *= sin(theta);
-                x1[1] *= sin(theta);
-                x1[3] = R * cos(theta);
-            }
+//            if (dim == 3) {
+//                x1[0] *= sin(theta);
+//                x1[1] *= sin(theta);
+//                x1[3] = R * cos(theta);
+//            }
 
-            for (double k : x1) {
+            for (double k: x1) {
                 rad += k * k;
             }
 
             // вторая космическая скорость
-            double absV = sqrt(G * stars[0]->m / sqrt(rad)),
-                   alpha = (2 * M_PI * rand()) / RAND_MAX;
+            double absV = sqrt(G * central_star->m / sqrt(rad)),
+                    alpha = (2 * M_PI * rand()) / RAND_MAX;
             // если размерность 3, нужен еще один угол как для координат(два угла годятся и для плоскости, желающие могут сделать)
             // v1[0] = absV * cos(alpha);
             // v1[1] = absV * sin(alpha);
             v1[0] = absV * sin(fi);
             v1[1] = -absV * cos(fi); // скорость направлена вдоль окружности с центром в начале координат
-            stars[i] = new Star(x1, v1, massEarth / (double)num * (double)(6 * i));
+            stars.insert(new Star(x1, v1, massEarth / (double) num * (double) (6 * i)));
         }
     };
 
-    ~Galaxy() { delete[] stars; };
+    ~Galaxy() { delete central_star; };
 
-    void update() const {
+    void update() {
         double sqrDist;
         double dCoord[dim];
 
-        for (size_t i = 0; i < num; ++i) { // force nullification
-            if (stars[i]) {
-                for (double &k: stars[i]->f) {
-                    k = 0;
-                }
-            }
+        for (Star *star_i: stars) { // force nullification
+            std::fill_n(star_i->f, dim, 0);
         }
 
-        for (size_t i = 0; i < num; i++) {
-            if (stars[i]) {
-                for (size_t j = i + 1; j < num; j++) {
-                    if (stars[j] && i != j) {
-                        sqrDist = 0;
-                        for (int k = 0; k < dim; ++k) {
-                            dCoord[k] = stars[i]->x[k] - stars[j]->x[k];
-                            sqrDist += dCoord[k] * dCoord[k];
-                        }
-
-                        // Объединение близких объектов
-                        if (sqrDist < sqrDistConnect) {
-                            *stars[i] += *stars[j];
-                            delete stars[j];
-                            stars[j] = nullptr;
-                        }
-                    }
-                }
-            }
-        }
-
-        for (size_t i = 0; i < num; i++) {
-            if (stars[i]) {
-                for (size_t j = i + 1; j < num; j++) {
-                    if (i != j && stars[j]) {
-                        sqrDist = 0;
-                        for (int k = 0; k < dim; ++k) {
-                            dCoord[k] = stars[i]->x[k] - stars[j]->x[k];
-                            sqrDist += dCoord[k] * dCoord[k];
-                        }
-
-                        double dist = sqrt(sqrDist); // для знаменателя пока квадрат, потом возьмем корень
-                        for (int k = 0; k < dim; ++k) {
-                            double tmp = G * stars[i]->m * stars[j]->m / sqrDist;
-                            stars[i]->f[k] -= tmp * dCoord[k] / dist;
-                            stars[j]->f[k] += tmp * dCoord[k] / dist;
-                        }
-                    }
-                }
-            }
-        }
-
-        for (size_t i = 0; i < num; ++i) {
-            if (stars[i]) {
+        for (auto star_i = stars.begin(); star_i != stars.end(); ++star_i) {
+            for (auto star_j = std::next(star_i); star_j != stars.end();) {
+                sqrDist = 0;
                 for (int k = 0; k < dim; ++k) {
-                    stars[i]->v[k] +=
-                            dt * stars[i]->f[k] / stars[i]->m; //можно не делить на массу, а выше суммировать ускорение
+                    dCoord[k] = (*star_i)->x[k] - (*star_j)->x[k];
+                    sqrDist += dCoord[k] * dCoord[k];
                 }
-                for (int k = 0; k < dim; ++k) {
-                    stars[i]->x[k] += dt * stars[i]->v[k];
+
+                if (sqrDist < sqrDistConnect) {
+                    // Connect if near enough
+                    **star_i += **star_j;
+                    if (*star_j == central_star) central_star = *star_i;
+                    delete *star_j;
+                    star_j = stars.erase(star_j);
+                } else {
+                    // Else update forces
+                    double inv_dist = invsqrtQuake(sqrDist);
+                    for (int k = 0; k < dim; ++k) {
+                        double tmp = G * (*star_i)->m * (*star_j)->m / sqrDist;
+                        (*star_i)->f[k] -= tmp * dCoord[k] * inv_dist;
+                        (*star_j)->f[k] += tmp * dCoord[k] * inv_dist;
+                    }
+                    ++star_j;
                 }
+            }
+            for (int k = 0; k < dim; ++k) {
+                // Update velocity and coords
+                (*star_i)->v[k] += dt * (*star_i)->f[k] / (*star_i)->m;
+                (*star_i)->x[k] += dt * (*star_i)->v[k];
             }
         }
     }
