@@ -1,8 +1,8 @@
-#ifndef GALAXY_HPP
-#define GALAXY_HPP
+#ifndef GALAXY_SIMULATION_GALAXY_HPP
+#define GALAXY_SIMULATION_GALAXY_HPP
+#include <vector>
 
 #include "Star.hpp"
-#include <vector>
 
 
 class Galaxy : std::vector<Star *> {
@@ -21,4 +21,4 @@ public:
     ~Galaxy() { delete central_star; };
 };
 
-#endif // GALAXY_HPP
+#endif //GALAXY_SIMULATION_GALAXY_HPP

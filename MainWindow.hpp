@@ -1,5 +1,6 @@
-#pragma once
-
+#ifndef GALAXY_SIMULATION_MAINWINDOW_HPP
+#define GALAXY_SIMULATION_MAINWINDOW_HPP
+#include <QElapsedTimer>
 #include <QMainWindow>
 #include <QTimer>
 
@@ -15,9 +16,11 @@ public:
 
     ~MainWindow() override;
 
-    bool ellipse = false;
-    const QString textB[2] = {"Start", "Stop"};
+//    bool ellipse = false;
+    const QString textB[2] = {"Stop", "Start"};
     QTimer *timer = new QTimer(this);
+
+    QElapsedTimer elpTimer;
 
 private:
     Ui::MainWindow *ui;
@@ -29,3 +32,4 @@ private slots:
 
     void buttonText();
 };
+#endif //GALAXY_SIMULATION_MAINWINDOW_HPP

@@ -1,5 +1,5 @@
-#ifndef STAR_HPP
-#define STAR_HPP
+#ifndef GALAXY_SIMULATION_STAR_HPP
+#define GALAXY_SIMULATION_STAR_HPP
 #include "constants.hpp"
 
 class Star {
@@ -9,7 +9,7 @@ public:
     double m;
     double f[dim]{0};
     int size = sunSize;
-    QColor col;
+    int col;
 
     Star(const double *coord, const double *velocity, double mass);
 
@@ -19,4 +19,4 @@ private:
     void updateSize();
 };
 
-#endif //STAR_HPP
+#endif //GALAXY_SIMULATION_STAR_HPP

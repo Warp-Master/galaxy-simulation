@@ -1,12 +1,12 @@
-#include "MainWindow.hpp"
-#include <cmath>
-
-#include "build/ui_MainWindow.h"
 #include <QPainter>
 #include <QTime>
+#include <cmath>
+
+#include "MainWindow.hpp"
+#include "build/ui_MainWindow.h"
 #include "Star.hpp"
 #include "Galaxy.hpp"
-#include "constants.hpp"
+
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -38,12 +38,10 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     QPen pen(Qt::black, 1, Qt::SolidLine);
     painter.setPen(pen);
 
-//  QTime time = QTime::currentTime();
-//  int mSec = time.msec();
-//  int Sec = time.second();
-
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
+
+
     double coefX = length / 2 / 1e12; // system radius
     int centerX = length / 2;
     for (Star *star: *galaxy) {
@@ -51,14 +49,15 @@ void MainWindow::paintEvent(QPaintEvent *e) {
         brush.setColor(star->col);
         painter.setBrush(brush);
 
-        int x = floor(star->x[0] * coefX + centerX + topX0 - star->size * 0.5);
-        int y = floor(star->x[1] * coefX + centerX + topY0 - star->size * 0.5);
+        int x = std::floor(star->x[0] * coefX + centerX + topX0 - star->size * 0.5);
+        int y = std::floor(star->x[1] * coefX + centerX + topY0 - star->size * 0.5);
         // условие не рисовать вне квадрата
 //        if((0 < x && x < length) && (0 < y && y < h))
             painter.drawEllipse(x, y, star->size, star->size);
     }
+    elpTimer.start();
     galaxy->update();
     ui->lineEdit->setText(QString::number(galaxy->star_cnt));
     ui->lineEdit_2->setText(QString::number(galaxy->central_star->m));
-    ui->lineEdit_3->setText(QString::number(galaxy->central_star->x[0]));
+    ui->lineEdit_3->setText(QString::number(1e9 / elpTimer.nsecsElapsed()));
 }

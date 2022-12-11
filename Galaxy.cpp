@@ -1,13 +1,12 @@
 #include <iostream>
+
 #include "cmath"
 #include "Galaxy.hpp"
 
-
-double rsqrtQuake( double number )
-{
+double rsqrtQuake(double number) {
     double y = number;
     double x2 = y * 0.5;
-    std::int64_t i = *(std::int64_t *) &y;  // evil floating point bit level hacking
+    int64_t i = *(int64_t *) &y;  // evil floating point bit level hacking
     i = 0x5fe6eb50c7b537a9 - (i >> 1);      // what the fuck?
     y = *(double *) &i;
     y = y * (1.5 - (x2 * y * y));           // 1st iteration
@@ -29,9 +28,6 @@ void Galaxy::memory_clear() {
         }
         std::swap(at(l), at(r));
     }
-    std::cout << "memory cleared!" << '\n';
-    std::cout << "old size " << size() << '\n';
-    std::cout << "new size " << star_cnt << std::endl;
     resize(star_cnt);
     shrink_to_fit();
 }
@@ -43,7 +39,6 @@ void Galaxy::mergeStars(size_t a, size_t b) {
     at(b) = nullptr;
     --star_cnt;
 }
-
 
 Galaxy::Galaxy(size_t n): star_cnt(n), resizeCnt(n / 2) {
     reserve(n);
@@ -111,6 +106,7 @@ void Galaxy::update() {
 
     if (star_cnt <= resizeCnt) {
         memory_clear();
+        std::cout << "memory cleared!" << '\n';
         resizeCnt = star_cnt / 2;
     }
 }
