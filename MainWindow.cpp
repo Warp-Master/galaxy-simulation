@@ -1,7 +1,7 @@
 #include "MainWindow.hpp"
 #include <cmath>
 
-#include "build/ui_mainwindow.h"
+#include "build/ui_MainWindow.h"
 #include <QPainter>
 #include <QTime>
 #include "Star.hpp"
@@ -10,10 +10,10 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-//    connect(ui->pushButtonStart,  SIGNAL(clicked()), this, SLOT(buttonText()));
+    connect(ui->pushButtonStart,  SIGNAL(clicked()), this, SLOT(buttonText()));
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::update));
 //    connect(timer, &QTimer::timeout, this, SLOT(myTimer()));
-    timer->start(1);
+    timer->start(0);
 }
 
 MainWindow::~MainWindow() {
@@ -30,7 +30,6 @@ void MainWindow::buttonText() {
     }
 }
 
-const int topX0 = 100, topY0 = 100, h = 800, length = 800;
 Galaxy *galaxy = new Galaxy(numStars);
 
 void MainWindow::paintEvent(QPaintEvent *e) {
@@ -45,24 +44,21 @@ void MainWindow::paintEvent(QPaintEvent *e) {
 
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
-
     double coefX = length / 2 / 1e12; // system radius
     int centerX = length / 2;
-    for (Star *star_i: galaxy->stars) {
-        brush.setColor(star_i->col);
+    for (Star *star: *galaxy) {
+        if (!star) continue;
+        brush.setColor(star->col);
         painter.setBrush(brush);
+
+        int x = floor(star->x[0] * coefX + centerX + topX0 - star->size * 0.5);
+        int y = floor(star->x[1] * coefX + centerX + topY0 - star->size * 0.5);
         // условие не рисовать вне квадрата
-        /* if(galactika->stars[i]->x[0] * coefX + centerX + topX0 > 0 &&
-            galactika->stars[i]->x[0] * coefX + centerX  < length &&
-            galactika->stars[i]->x[1] * coefX + centerX + topY0 > 0 &&
-            galactika->stars[i]->x[1] * coefX + centerX  < h) */
-        painter.drawEllipse(floor(star_i->x[0] * coefX + centerX + topX0),
-                            floor(star_i->x[1] * coefX + centerX + topY0),
-                            6, 6);
+//        if((0 < x && x < length) && (0 < y && y < h))
+            painter.drawEllipse(x, y, star->size, star->size);
     }
     galaxy->update();
-
-    ui->lineEdit->setText(QString::number(galaxy->stars.size()));
+    ui->lineEdit->setText(QString::number(galaxy->star_cnt));
     ui->lineEdit_2->setText(QString::number(galaxy->central_star->m));
     ui->lineEdit_3->setText(QString::number(galaxy->central_star->x[0]));
 }

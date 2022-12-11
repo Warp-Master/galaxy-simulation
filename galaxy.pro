@@ -11,6 +11,8 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
+    Star.cpp \
+    Galaxy.cpp \
     MainWindow.cpp
 
 HEADERS += \

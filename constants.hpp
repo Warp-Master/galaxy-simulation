@@ -1,7 +1,10 @@
 #ifndef GALAXY_SIMULATION_CONSTANTS_HPP
 #define GALAXY_SIMULATION_CONSTANTS_HPP
+#include <QPainter>
+const int topX0 = 100, topY0 = 100, h = 800, length = 800;
+
 const int dim = 2;
-const int numStars = 800;
+const int numStars = 8000;
 const int borderMassC = 1;
 const double G = 6.67408e-11,
         systemRadius = 1e12,
@@ -12,6 +15,8 @@ const double massSun = 1.98892e30,
         massUran = 86.832e24,
         massEarth = 5.9742e24,
         massVenus = 4.867e24;
+
+const int sunSize = 50; // pixels
 
 const double borderMass[] = {borderMassC * massVenus, borderMassC * massEarth, borderMassC * massUran,
                              borderMassC * massJup, borderMassC * massSun};

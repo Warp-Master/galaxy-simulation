@@ -1,8 +1,6 @@
-#pragma once
-
-#include "cmath"
+#ifndef STAR_HPP
+#define STAR_HPP
 #include "constants.hpp"
-#include <QPainter>
 
 class Star {
 public:
@@ -10,40 +8,15 @@ public:
     double v[dim]{0};
     double m;
     double f[dim]{0};
+    int size = sunSize;
     QColor col;
 
-    Star(const double *coord, const double *speed, double mass);
+    Star(const double *coord, const double *velocity, double mass);
 
     Star& operator+=(const Star& rhs);
 private:
     void updateColor();
+    void updateSize();
 };
 
-Star::Star(const double *coord, const double *speed, double mass) {
-    for (int k = 0; k < dim; ++k) {
-        x[k] = coord[k];
-        v[k] = speed[k];
-    }
-    m = mass;
-    updateColor();
-}
-
-Star& Star::operator+=(const Star &rhs) {
-    for (int i = 0; i < dim;++i) {
-        f[i] += rhs.f[i];
-        v[i] = (v[i]*m + rhs.v[i]*rhs.m) / (m + rhs.m);
-    }
-    m += rhs.m;
-    updateColor();
-    return *this;
-}
-
-void Star::updateColor() {
-    col = colStar[nColor - 1];
-    for (int i = 0; i < nColor - 1; ++i) {
-        if (m <= borderMass[i]) {
-            col = colStar[i];
-            break;
-        }
-    }
-}
+#endif //STAR_HPP
