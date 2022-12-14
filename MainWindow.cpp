@@ -33,7 +33,7 @@ void MainWindow::buttonText() {
 Galaxy *galaxy = new Galaxy(numStars);
 
 void MainWindow::paintEvent(QPaintEvent *e) {
-    Q_UNUSED(e);
+    Q_UNUSED(e)
     QPainter painter(this);
     QPen pen(Qt::black, 1, Qt::SolidLine);
     painter.setPen(pen);
@@ -42,7 +42,7 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     brush.setStyle(Qt::SolidPattern);
 
 
-    double coefX = length / 2 / 1e12; // system radius
+    double coefX = (double)length / 2 / 1e12; // system radius
     int centerX = length / 2;
     for (Star *star: *galaxy) {
         if (!star) continue;
@@ -59,5 +59,5 @@ void MainWindow::paintEvent(QPaintEvent *e) {
     galaxy->update();
     ui->lineEdit->setText(QString::number(galaxy->star_cnt));
     ui->lineEdit_2->setText(QString::number(galaxy->central_star->m));
-    ui->lineEdit_3->setText(QString::number(1e9 / elpTimer.nsecsElapsed()));
+    ui->lineEdit_3->setText(QString::number(1e9 / (double)elpTimer.nsecsElapsed()));
 }

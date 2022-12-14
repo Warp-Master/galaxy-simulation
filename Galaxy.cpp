@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "cmath"
+#include <cmath>
 #include "Galaxy.hpp"
 
 double rsqrtQuake(double number) {
@@ -65,7 +65,7 @@ Galaxy::Galaxy(size_t n): star_cnt(n), resizeCnt(n / 2) {
 }
 
 void Galaxy::update() {
-    for (Star *star: *this) { // force nullification
+    for (Star *star: *this) { // remove all previous forces
         if (!star) continue;
         std::fill_n(star->f, dim, 0);
     }
