@@ -1,3 +1,4 @@
+#include <iostream>
 #include <QPainter>
 #include <QTime>
 #include <cmath>
@@ -8,12 +9,18 @@
 #include "Galaxy.hpp"
 
 
+const int centerX = width / 2;
+Galaxy *galaxy = new Galaxy(numStars);
+
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     connect(ui->pushButtonStart,  SIGNAL(clicked()), this, SLOT(buttonText()));
-    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::update));
-//    connect(timer, &QTimer::timeout, this, SLOT(myTimer()));
-    timer->start(0);
+    if (ui->pushButtonStart->text() == textB[0]) {
+        connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::update));
+    }
+
+    timer->start(10);
 }
 
 MainWindow::~MainWindow() {
@@ -30,20 +37,15 @@ void MainWindow::buttonText() {
     }
 }
 
-Galaxy *galaxy = new Galaxy(numStars);
-
 void MainWindow::paintEvent(QPaintEvent *e) {
     Q_UNUSED(e)
-    QPainter painter(this);
-    QPen pen(Qt::black, 1, Qt::SolidLine);
+
+    QPen pen{Qt::black, 1, Qt::SolidLine};
+    QBrush brush{Qt::SolidPattern};
+    QPainter painter{this};
+
     painter.setPen(pen);
 
-    QBrush brush;
-    brush.setStyle(Qt::SolidPattern);
-
-
-    double coefX = (double)length / 2 / 1e12; // system radius
-    int centerX = length / 2;
     for (Star *star: *galaxy) {
         if (!star) continue;
         brush.setColor(star->col);
@@ -51,13 +53,12 @@ void MainWindow::paintEvent(QPaintEvent *e) {
 
         int x = std::floor(star->x[0] * coefX + centerX + topX0 - star->size * 0.5);
         int y = std::floor(star->x[1] * coefX + centerX + topY0 - star->size * 0.5);
-        // условие не рисовать вне квадрата
-//        if((0 < x && x < length) && (0 < y && y < h))
-            painter.drawEllipse(x, y, star->size, star->size);
+        painter.drawEllipse(x, y, star->size, star->size);
     }
-    elpTimer.start();
+
+    elpTimer->start();
     galaxy->update();
-    ui->lineEdit->setText(QString::number(galaxy->star_cnt));
-    ui->lineEdit_2->setText(QString::number(galaxy->central_star->m));
-    ui->lineEdit_3->setText(QString::number(1e9 / (double)elpTimer.nsecsElapsed()));
+    ui->lineEdit->setText(QString::number(galaxy->starCnt));
+    ui->lineEdit_2->setText(QString::number(galaxy->centralStar->m));
+    ui->lineEdit_3->setText(QString::number(1e9 / (double)elpTimer->nsecsElapsed()));
 }

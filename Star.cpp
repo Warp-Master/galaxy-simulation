@@ -1,4 +1,5 @@
 #include <cmath>
+#include <algorithm>
 
 #include "Star.hpp"
 #include "constants.hpp"
@@ -14,7 +15,7 @@ const int starColors[] = {0x264653,
                           0xe63946};
 const int nBorders = sizeof(borderMass) / sizeof(borderMass[0]);
 
-Star::Star(const double *coord, const double *velocity, double mass): col(0xffffff) {
+Star::Star(const double *coord, const double *velocity, double mass): size(0), col(0xffffff) {
     for (int k = 0; k < dim; ++k) {
         x[k] = coord[k];
         v[k] = velocity[k];
@@ -24,9 +25,16 @@ Star::Star(const double *coord, const double *velocity, double mass): col(0xffff
     updateSize();
 }
 
+
+bool Star::isValid() const {
+    return std::any_of(x.begin(),
+                       x.end(),
+                       [](double k){ return std::abs(k) < systemRadius; });
+}
+
 Star& Star::operator+=(const Star &rhs) {
     for (int i = 0; i < dim;++i) {
-        v[i] = (v[i]*m + rhs.v[i]*rhs.m) / (m + rhs.m);
+        v[i] = (v[i] * m + rhs.v[i] * rhs.m) / (m + rhs.m);
     }
     m += rhs.m;
     updateColor();
@@ -36,14 +44,13 @@ Star& Star::operator+=(const Star &rhs) {
 
 void Star::updateColor() {
     int i = 0;
-    while (i + 1 < nBorders && borderMass[i] < m ) ++i;
+    while (i + 1 < nBorders && borderMass[i] < m) ++i;
     col = starColors[i];
 }
 
 void Star::updateSize() {
     int i = 0;
     while (i + 1 < nBorders && borderMass[i] < m) ++i;
-    if (floor(m / massSun) > 3) i += 3;
-    else i += (int)(m / massSun);
+    i += (int)fmin(3, floor(m / massSun));
     size = i + 1;
 }

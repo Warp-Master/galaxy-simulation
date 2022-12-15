@@ -17,15 +17,16 @@ public:
     ~MainWindow() override;
 
 //    bool ellipse = false;
-    const QString textB[2] = {"Stop", "Start"};
+    const QString textB[2] = {"Start", "Stop"};
     QTimer *timer = new QTimer(this);
 
-    QElapsedTimer elpTimer;
+    QElapsedTimer *elpTimer = new QElapsedTimer;
 
 private:
     Ui::MainWindow *ui;
 
 protected:
+//    void update(QPaintEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
 private slots:

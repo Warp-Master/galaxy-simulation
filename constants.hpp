@@ -1,6 +1,6 @@
 #ifndef GALAXY_SIMULATION_CONSTANTS_HPP
 #define GALAXY_SIMULATION_CONSTANTS_HPP
-const int topX0 = 100, topY0 = 100, h = 800, length = 800;
+const int topX0 = 100, topY0 = 100, height = 800, width = 800;
 
 const int dim = 2;
 const int numStars = 4000;
@@ -15,5 +15,5 @@ const double massSun = 1.98892e30,
         massEarth = 5.9742e24,
         massVenus = 4.867e24;
 
-const int sunSize = 50; // pixels
+const double coefX = (double) width / 2e12;
 #endif //GALAXY_SIMULATION_CONSTANTS_HPP
