@@ -9,7 +9,6 @@
 #include "Galaxy.hpp"
 
 
-const int centerX = width / 2;
 Galaxy *galaxy = new Galaxy(numStars);
 
 

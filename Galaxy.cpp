@@ -14,6 +14,15 @@ double rsqrtQuake(double number) {
     return y;
 }
 
+void updateForce(const double *delta, double sqrDist, Star *a, Star *b) {
+    double invDist = rsqrtQuake(sqrDist);
+    double tmp = G * a->m * b->m * invDist * invDist * invDist;
+    for (int k = 0; k < dim; ++k) {
+        a->f[k] -= tmp * delta[k];
+        b->f[k] += tmp * delta[k];
+    }
+}
+
 void Galaxy::memory_clear() {
     size_t l = 0;
     size_t r = size() - 1;
@@ -56,7 +65,7 @@ Galaxy::Galaxy(size_t n): starCnt(n), resizeCnt(n / 2) {
     double baseMass = massEarth / (double)n * 6;
     // Creating other objects
     for (size_t i = 1; i < n; ++i) {
-        double R  = rand() * systemRadius / RAND_MAX,
+        double R  = rand() * spawnRadius / RAND_MAX,
                fi = rand() * 2 * M_PI / RAND_MAX;
         pos[0] = R * cos(fi);
         pos[1] = R * sin(fi);
@@ -70,16 +79,12 @@ Galaxy::Galaxy(size_t n): starCnt(n), resizeCnt(n / 2) {
 }
 
 void Galaxy::update() {
-    for (Star *star: *this) { // remove all previous forces
-        if (!star) continue;
-        std::fill(star->f.begin(), star->f.end(), 0);
-    }
-
     for (size_t i = 0; i < size(); ++i) {
         if (!at(i)) continue;
         if (!at(i)->isValid()) {
             if (at(i) == centralStar) {
-                std::cout << "Ахтунг" << std::endl;
+                std::cout << "[WARN] central star out of range" << std::endl;
+                return;
             }
             removeStar(i);
             continue;
@@ -87,34 +92,17 @@ void Galaxy::update() {
 
         for (size_t j = i + 1; j < size(); ++j) {
             if (!at(j)) continue;
-            // Calculate distance
-            double sqrDist = 0;
-            double dCoord[dim];
-            for (int k = 0; k < dim; ++k) {
-                dCoord[k] = at(i)->x[k] - at(j)->x[k];
-                sqrDist += dCoord[k] * dCoord[k];
-            }
-
+            double delta[dim];
+            double sqrDist = at(i)->getSqrDistTo(at(j), delta);
             // Connect if near enough
             if (sqrDist < sqrDistConnect) {
                 mergeStars(i, j);
                 continue;
             }
-
-            // Update forces
-            double inv_dist = rsqrtQuake(sqrDist);
-            double tmp = G * at(i)->m * at(j)->m / sqrDist;
-            for (int k = 0; k < dim; ++k) {
-                at(i)->f[k] -= tmp * dCoord[k] * inv_dist;
-                at(j)->f[k] += tmp * dCoord[k] * inv_dist;
-            }
+            updateForce(delta, sqrDist, at(i), at(j));
         }
 
-        // Update velocity and coords
-        for (int k = 0; k < dim; ++k) {
-            at(i)->v[k] += dt * at(i)->f[k] / at(i)->m;
-            at(i)->x[k] += dt * at(i)->v[k];
-        }
+        at(i)->updateVelAndCoords();
     }
 
     if (starCnt <= resizeCnt) {

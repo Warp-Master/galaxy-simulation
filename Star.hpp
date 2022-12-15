@@ -18,6 +18,8 @@ public:
     bool isValid() const;
 
     Star& operator+=(const Star& rhs);
+    void updateVelAndCoords();
+    double getSqrDistTo(Star *b, double *delta);
 private:
     void updateColor();
     void updateSize();

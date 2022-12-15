@@ -27,7 +27,7 @@ Star::Star(const double *coord, const double *velocity, double mass): size(0), c
 
 
 bool Star::isValid() const {
-    return std::any_of(x.begin(),
+    return std::all_of(x.begin(),
                        x.end(),
                        [](double k){ return std::abs(k) < systemRadius; });
 }
@@ -40,6 +40,23 @@ Star& Star::operator+=(const Star &rhs) {
     updateColor();
     updateSize();
     return *this;
+}
+
+void Star::updateVelAndCoords() {
+    for (int k = 0; k < dim; ++k) {
+        v[k] += dt * f[k] / m;
+        x[k] += dt * v[k];
+    }
+    std::fill(f.begin(), f.end(), 0);
+}
+
+double Star::getSqrDistTo(Star *b, double *delta) {
+    double res = 0;
+    for (int k = 0; k < dim; ++k) {
+        delta[k] = x[k] - b->x[k];
+        res += delta[k] * delta[k];
+    }
+    return res;
 }
 
 void Star::updateColor() {
