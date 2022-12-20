@@ -8,6 +8,7 @@
 class Galaxy : std::vector<Star *> {
 private:
     void memory_clear();
+    void flush_tail();
     void mergeStars(size_t a, size_t b);
     void removeStar(size_t i);
 public:
@@ -19,6 +20,8 @@ public:
 
     explicit Galaxy(size_t n = numStars);
     void update();
+    std::pair<std::vector<Star *>::iterator,
+            std::vector<Star *>::iterator> getTopKMass(const size_t &k);
     ~Galaxy() { delete centralStar; };
 };
 

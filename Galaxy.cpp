@@ -37,8 +37,23 @@ void Galaxy::memory_clear() {
         }
         std::swap(at(l++), at(r--));
     }
+    flush_tail();
+}
+
+void Galaxy::flush_tail() {
     resize(starCnt);
     shrink_to_fit();
+}
+
+std::pair<std::vector<Star *>::iterator,
+        std::vector<Star *>::iterator> Galaxy::getTopKMass(const size_t &k) {
+    std::sort(
+            this->begin(), this->end(),
+            [](const Star *a, const Star *b) -> bool {
+                return (a && !b) || (a && a->m > b->m);
+            });
+    flush_tail();
+    return std::make_pair(this->begin(), this->begin() + std::min<size_t>(starCnt, k));
 }
 
 void Galaxy::mergeStars(size_t a, size_t b) {
@@ -65,8 +80,8 @@ Galaxy::Galaxy(size_t n): starCnt(n), resizeCnt(n / 2) {
     double baseMass = massEarth / (double)n * 6;
     // Creating other objects
     for (size_t i = 1; i < n; ++i) {
-        double R  = rand() * spawnRadius / RAND_MAX,
-               fi = rand() * 2 * M_PI / RAND_MAX;
+        double R  = rand() / (double)RAND_MAX * spawnRadius,
+               fi = rand() / (double)RAND_MAX * 2 * M_PI ;
         pos[0] = R * cos(fi);
         pos[1] = R * sin(fi);
 

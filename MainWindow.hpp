@@ -16,10 +16,8 @@ public:
 
     ~MainWindow() override;
 
-//    bool ellipse = false;
     const QString textB[2] = {"Start", "Stop"};
     QTimer *timer = new QTimer(this);
-
     QElapsedTimer *elpTimer = new QElapsedTimer;
 
 private:
@@ -30,7 +28,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private slots:
-
+    void showMassTable();
     void buttonText();
 };
 #endif //GALAXY_SIMULATION_MAINWINDOW_HPP
