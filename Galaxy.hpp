@@ -7,15 +7,12 @@
 
 class Galaxy : std::vector<Star *> {
 private:
-    void memory_clear();
-    void flush_tail();
     void mergeStars(size_t a, size_t b);
     void removeStar(size_t i);
 public:
     using vector::begin;
     using vector::end;
-    size_t starCnt;
-    size_t resizeCnt;
+    using vector::size;
     Star *centralStar;
 
     explicit Galaxy(size_t n = numStars);

@@ -72,7 +72,7 @@ void MainWindow::paintEvent(QPaintEvent *e) {
 
     elpTimer->start();
     galaxy->update();
-    ui->lineEdit->setText(QString::number(galaxy->starCnt));
+    ui->lineEdit->setText(QString::number(galaxy->size()));
     ui->lineEdit_2->setText(QString::number(galaxy->centralStar->m));
     ui->lineEdit_3->setText(QString::number(1e9 / (double)elpTimer->nsecsElapsed()));
 }

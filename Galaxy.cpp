@@ -23,37 +23,14 @@ void updateForce(const double *delta, double sqrDist, Star *a, Star *b) {
     }
 }
 
-void Galaxy::memory_clear() {
-    size_t l = 0;
-    size_t r = size() - 1;
-    while (l < r) {
-        if (at(l)) {
-            ++l;
-            continue;
-        }
-        if (!at(r)) {
-            --r;
-            continue;
-        }
-        std::swap(at(l++), at(r--));
-    }
-    flush_tail();
-}
-
-void Galaxy::flush_tail() {
-    resize(starCnt);
-    shrink_to_fit();
-}
-
 std::pair<std::vector<Star *>::iterator,
         std::vector<Star *>::iterator> Galaxy::getTopKMass(const size_t &k) {
     std::sort(
             this->begin(), this->end(),
             [](const Star *a, const Star *b) -> bool {
-                return (a && !b) || (a && a->m > b->m);
+                return a->m > b->m;
             });
-    flush_tail();
-    return std::make_pair(this->begin(), this->begin() + std::min<size_t>(starCnt, k));
+    return std::make_pair(this->begin(), this->begin() + std::min<size_t>(size(), k));
 }
 
 void Galaxy::mergeStars(size_t a, size_t b) {
@@ -64,12 +41,12 @@ void Galaxy::mergeStars(size_t a, size_t b) {
 
 void Galaxy::removeStar(size_t i) {
     delete at(i);
-    at(i) = nullptr;
-    --starCnt;
+    at(i) = back();
+    pop_back();
 }
 
 
-Galaxy::Galaxy(size_t n): starCnt(n), resizeCnt(n / 2) {
+Galaxy::Galaxy(size_t n) {
     reserve(n);
     double pos[dim]{0};
     double v[dim]{0};
@@ -95,7 +72,6 @@ Galaxy::Galaxy(size_t n): starCnt(n), resizeCnt(n / 2) {
 
 void Galaxy::update() {
     for (size_t i = 0; i < size(); ++i) {
-        if (!at(i)) continue;
         if (!at(i)->isValid()) {
             if (at(i) == centralStar) {
                 std::cout << "[WARN] central star out of range" << std::endl;
@@ -106,7 +82,6 @@ void Galaxy::update() {
         }
 
         for (size_t j = i + 1; j < size(); ++j) {
-            if (!at(j)) continue;
             double delta[dim];
             double sqrDist = at(i)->getSqrDistTo(at(j), delta);
             // Connect if near enough
@@ -118,11 +93,5 @@ void Galaxy::update() {
         }
 
         at(i)->updateVelAndCoords();
-    }
-
-    if (starCnt <= resizeCnt) {
-        memory_clear();
-        std::cout << "memory cleared!" << '\n';
-        resizeCnt = starCnt / 2;
     }
 }
