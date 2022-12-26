@@ -1,7 +1,8 @@
 # Galaxy Simulation
-## Compiling
+## Building
 ```bash
-qmake -o build/Makefile qalaxy.pro
+mkdir -p build
+qmake -o build/Makefile galaxy.pro
 cd build
 make all
 ```
